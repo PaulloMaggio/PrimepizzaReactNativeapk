@@ -23,23 +23,21 @@ function AppRoutes() {
       <Stack.Screen 
         name="Dashboard" 
         component={Dashboard} 
-        options={{ headerShown: false }}
+        options={{ headerShown: false }} 
       />
-      <Stack.Screen
-        name="Order"
-        component={Order}
-        options={{ headerShown: false }}
+      <Stack.Screen 
+        name="Order" 
+        component={Order} 
+        options={{ headerShown: false }} 
       />
-      <Stack.Screen
-        name="FinishOrder"
-        component={FinishOrder}
-        options={{
-          title: 'Finalizando',
-          headerStyle: {
-            backgroundColor: '#1d1d2e'
-          },
-          headerTintColor: '#FFF'
-        }}
+      <Stack.Screen 
+        name="FinishOrder" 
+        component={FinishOrder} 
+        options={{ 
+          title: 'Finalizando', 
+          headerStyle: { backgroundColor: '#1d1d2e' }, 
+          headerTintColor: '#FFF' 
+        }} 
       />
     </Stack.Navigator>
   );
