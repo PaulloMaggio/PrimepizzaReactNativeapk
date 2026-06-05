@@ -1,9 +1,7 @@
-import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import Dashboard from '../pages/Dashboard';
-import Order from '../pages/Order'
-import FinishOrder from '../pages/FinishOrder'
+import FinishOrder from '../pages/FinishOrder';
+import Order from '../pages/Order';
 
 export type StackPramsList = {
   Dashboard: undefined;
@@ -19,8 +17,8 @@ export type StackPramsList = {
 
 const Stack = createNativeStackNavigator<StackPramsList>();
 
-function AppRoutes(){
-  return(
+function AppRoutes() {
+  return (
     <Stack.Navigator>
       <Stack.Screen 
         name="Dashboard" 
@@ -37,14 +35,14 @@ function AppRoutes(){
         component={FinishOrder}
         options={{
           title: 'Finalizando',
-          headerStyle:{
+          headerStyle: {
             backgroundColor: '#1d1d2e'
           },
           headerTintColor: '#FFF'
         }}
       />
     </Stack.Navigator>
-  )
+  );
 }
 
 export default AppRoutes;

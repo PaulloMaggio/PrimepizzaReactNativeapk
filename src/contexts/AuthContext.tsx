@@ -1,7 +1,7 @@
-import React, { useState, createContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, ReactNode, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import { api } from '../services/api';
-import { Alert } from 'react-native'; // Adicionando o Alert
 
 type AuthContextData = {
   user: UserProps | null;
@@ -16,7 +16,7 @@ type UserProps = {
   id: string;
   name: string;
   email: string;
-  token: string
+  token: string;
 }
 
 type AuthProviderProps = {
@@ -29,6 +29,30 @@ type SignInProps = {
 }
 
 export const AuthContext = createContext({} as AuthContextData);
+
+function decodeJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let str = base64.replace(/=+$/, '');
+    let output = '';
+    
+    for (let bc = 0, bs = 0, r1, r2, i = 0; (r2 = str.charAt(i++)); ) {
+      r2 = chars.indexOf(r2);
+      if (~r2) {
+        bs = bc % 4 ? bs * 64 + r2 : r2;
+        if (bc++ % 4) {
+          r1 = (bs >> ((-2 * bc) & 6));
+          output += String.fromCharCode(255 & r1);
+        }
+      }
+    }
+    return JSON.parse(output);
+  } catch (e) {
+    return null;
+  }
+}
 
 export function AuthProvider({children}: AuthProviderProps){
   const [user, setUser] = useState<UserProps | null>(null);
@@ -56,22 +80,31 @@ export function AuthProvider({children}: AuthProviderProps){
 
     try {
       const response = await api.post('/session', { email, password });
-      
-      const { id, name, token } = response.data;
+      const { token } = response.data;
 
       if (!token) {
-        // Se a API não retornar um token, lançamos um erro para ir para o bloco catch
         throw new Error('Token de autenticação não encontrado.');
       }
 
-      const dataToSave = { id, name, email, token };
+      const decoded = decodeJwt(token);
+
+      if (!decoded) {
+        throw new Error('Falha ao decodificar o token.');
+      }
+
+      const dataToSave = { 
+        id: decoded.sub, 
+        name: decoded.name, 
+        email: decoded.email || email, 
+        token 
+      };
+
       await AsyncStorage.setItem('@sujeitopizzaria', JSON.stringify(dataToSave));
       
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(dataToSave);
 
     } catch (err) {
-      // Verifica se o erro é do tipo Axios e tem a resposta do servidor
       if (
         typeof err === 'object' &&
         err !== null &&

@@ -1,33 +1,33 @@
-import React, { useContext } from 'react';
-
-import {View, ActivityIndicator} from 'react-native';
-
+import { NavigationContainer } from '@react-navigation/native';
+import { useContext } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { AuthContext } from '../contexts/AuthContext';
 import AppRoutes from './app.routes';
 import AuthRoutes from './auth.routes';
 
-import { AuthContext } from '../contexts/AuthContext'
-
-function Routes(){
+function Routes() {
   const { isAuthenticated, loading } = useContext(AuthContext);
 
-  if(loading){
-    return(
+  if (loading) {
+    return (
       <View 
         style={{ 
-          flex:1, 
+          flex: 1, 
           backgroundColor: '#1D1D2E', 
           justifyContent: 'center', 
-          alignItems:'center' 
+          alignItems: 'center' 
         }}
       >
         <ActivityIndicator size={60} color="#FFF" />
       </View>
-    )
+    );
   }
 
-  return(
-    isAuthenticated ? <AppRoutes/> : <AuthRoutes/>
-  )
+  return (
+    <NavigationContainer>
+      {isAuthenticated ? <AppRoutes /> : <AuthRoutes />}
+    </NavigationContainer>
+  );
 }
 
 export default Routes;

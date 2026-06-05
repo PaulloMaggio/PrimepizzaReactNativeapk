@@ -1,90 +1,54 @@
-import React, { useState, useContext } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert // Adicionando o Alert para feedback ao usuário
-} from 'react-native';
-
+import { useContext, useState } from 'react';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AuthContext } from '../../contexts/AuthContext';
 
-export default function SignIn(){
-  
-  const { signIn, loadingAuth} = useContext(AuthContext);
-
+export default function SignIn() {
+  const { signIn, loadingAuth } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  async function handleLogin(){
-    if(email === '' || password === ''){
-      // Alerta para campos vazios
+  async function handleLogin() {
+    if (email === '' || password === '') {
       Alert.alert('Atenção', 'Preencha todos os campos!');
       return;
     }
     await signIn({ email, password });
   }
 
-  return(
+  return (
     <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={require('../../assets/logo.png')}
-      />
-
+      <Image style={styles.logo} source={require('../../assets/logo.png')} />
       <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Digite seu email"  
-          style={styles.input}    
-          placeholderTextColor="#F0F0F0"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <TextInput
-          placeholder="Sua senha"     
-          style={styles.input}  
-          placeholderTextColor="#F0F0F0"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}       
-        />    
-
+        <TextInput placeholder="Digite seu email" style={styles.input} placeholderTextColor="#F0F0F0" value={email} onChangeText={setEmail} />
+        <TextInput placeholder="Sua senha" style={styles.input} placeholderTextColor="#F0F0F0" secureTextEntry={true} value={password} onChangeText={setPassword} />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          { loadingAuth ? (
-            <ActivityIndicator size={25} color="#FFF"/>
-          ) : (
-            <Text style={styles.buttonText}>Acessar</Text>
-          )}
-        </TouchableOpacity>  
+          {loadingAuth ? <ActivityIndicator size={25} color="#FFF" /> : <Text style={styles.buttonText}>Acessar</Text>}
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    justifyContent:'center',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1d1d2e'
   },
-  logo:{
+  logo: {
     marginBottom: 18,
     width: '60%',
     height: 100
   },
-  inputContainer:{
+  inputContainer: {
     width: '95%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 32,
-    paddingHorizontal: 14,
+    paddingHorizontal: 14
   },
-  input:{
+  input: {
     width: '95%',
     height: 40,
     backgroundColor: '#101026',
@@ -93,7 +57,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     color: '#FFF'
   },
-  button:{
+  button: {
     width: '95%',
     height: 40,
     backgroundColor: '#3fffa3',
@@ -101,9 +65,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  buttonText:{
-   fontSize: 18, 
-   fontWeight: 'bold',
-   color: '#101026'
+  buttonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#101026'
   }
 });
