@@ -5,7 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import AppRoutes from './app.routes';
 import AuthRoutes from './auth.routes';
 
-function Routes() {
+export default function Routes() {
   const { isAuthenticated, loading } = useContext(AuthContext);
 
   if (loading) {
@@ -22,5 +22,3 @@ function Routes() {
     </NavigationContainer>
   );
 }
-
-export default Routes;

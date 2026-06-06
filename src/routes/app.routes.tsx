@@ -17,7 +17,7 @@ export type StackPramsList = {
 
 const Stack = createNativeStackNavigator<StackPramsList>();
 
-function AppRoutes() {
+export default function AppRoutes() {
   return (
     <Stack.Navigator>
       <Stack.Screen 
@@ -42,5 +42,3 @@ function AppRoutes() {
     </Stack.Navigator>
   );
 }
-
-export default AppRoutes;

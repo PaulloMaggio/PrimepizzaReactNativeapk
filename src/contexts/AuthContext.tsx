@@ -54,7 +54,7 @@ function decodeJwt(token: string) {
   }
 }
 
-export function AuthProvider({children}: AuthProviderProps){
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -62,20 +62,25 @@ export function AuthProvider({children}: AuthProviderProps){
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    async function getUser(){
-      const userInfo = await AsyncStorage.getItem('@sujeitopizzaria');
+    async function getUser() {
+      try {
+        const userInfo = await AsyncStorage.getItem('@sujeitopizzaria');
 
-      if (userInfo) {
-        let hasUser: UserProps = JSON.parse(userInfo);
-        api.defaults.headers.common['Authorization'] = `Bearer ${hasUser.token}`;
-        setUser(hasUser);
+        if (userInfo) {
+          let hasUser: UserProps = JSON.parse(userInfo);
+          setUser(hasUser);
+        }
+      } catch (err) {
+        await AsyncStorage.removeItem('@sujeitopizzaria');
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     getUser();
   }, []);
 
-  async function signIn({ email, password }: SignInProps){
+  async function signIn({ email, password }: SignInProps) {
     setLoadingAuth(true);
 
     try {
@@ -92,16 +97,14 @@ export function AuthProvider({children}: AuthProviderProps){
         throw new Error('Falha ao decodificar o token.');
       }
 
-      const dataToSave = { 
-        id: decoded.sub, 
-        name: decoded.name, 
-        email: decoded.email || email, 
-        token 
+      const dataToSave = {
+        id: decoded.sub,
+        name: decoded.name,
+        email: decoded.email || email,
+        token
       };
 
       await AsyncStorage.setItem('@sujeitopizzaria', JSON.stringify(dataToSave));
-      
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(dataToSave);
 
     } catch (err) {
@@ -116,29 +119,33 @@ export function AuthProvider({children}: AuthProviderProps){
       ) {
         Alert.alert('Ops!', 'Email ou senha incorretos.');
       }
-      console.log('Erro ao acessar:', err);
     } finally {
       setLoadingAuth(false);
     }
   }
 
-  async function signOut(){
-    await AsyncStorage.clear();
-    setUser(null);
+  async function signOut() {
+    try {
+      await AsyncStorage.clear();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setUser(null);
+    }
   }
 
-  return(
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated, 
-        signIn, 
-        loading, 
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        signIn,
+        loading,
         loadingAuth,
         signOut
       }}
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }

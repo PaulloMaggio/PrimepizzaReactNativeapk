@@ -60,8 +60,11 @@ export default function Order() {
 
   useEffect(() => {
     async function loadProducts() {
+      if (!categorySelected) return;
+
       const response = await api.get('/category/product', {
-        params: { category_id: categorySelected?.id }
+        // CORREÇÃO: Enviando category_Id com "I" maiúsculo para bater com o Backend!
+        params: { category_Id: categorySelected?.id }
       });
       setProducts(response.data);
       setProductSelected(response.data[0]);
@@ -82,6 +85,8 @@ export default function Order() {
 
   function handleChangeCategory(item: CategoryProps) {
     setCategorySelected(item);
+    setProducts([]);
+    setProductSelected(undefined);
   }
 
   function handleChangeProduct(item: ProductProps) {
@@ -89,6 +94,8 @@ export default function Order() {
   }
 
   async function handleAdd() {
+    if (!productSelected) return;
+
     try {
       const response = await api.post('/order/add', {
         orderId: route.params?.order_id,
@@ -134,16 +141,23 @@ export default function Order() {
           </TouchableOpacity>
         )}
       </View>
-      {category.length !== 0 && (
-        <TouchableOpacity style={styles.input} onPress={() => setModalCategoryVisible(true)}>
-          <Text style={{ color: '#FFF' }}>{categorySelected?.name}</Text>
-        </TouchableOpacity>
-      )}
-      {products.length !== 0 && (
-        <TouchableOpacity style={styles.input} onPress={() => setModalProductVisible(true)}>
-          <Text style={{ color: '#FFF' }}>{productSelected?.name}</Text>
-        </TouchableOpacity>
-      )}
+
+      <TouchableOpacity style={styles.input} onPress={() => setModalCategoryVisible(true)}>
+        <Text style={{ color: '#FFF' }}>
+          {categorySelected ? categorySelected.name : "Selecione uma categoria"}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.input, { opacity: products.length === 0 ? 0.6 : 1 }]} 
+        onPress={() => products.length > 0 && setModalProductVisible(true)}
+        disabled={products.length === 0}
+      >
+        <Text style={{ color: '#FFF' }}>
+          {productSelected ? productSelected.name : (categorySelected ? "Carregando produtos..." : "Selecione um produto")}
+        </Text>
+      </TouchableOpacity>
+
       <View style={styles.qtdContainer}>
         <Text style={styles.qtdText}>Quantidade</Text>
         <TextInput
@@ -154,6 +168,7 @@ export default function Order() {
           onChangeText={setAmount}
         />
       </View>
+
       <View style={styles.actions}>
         <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
           <Text style={styles.buttonText}>+</Text>
@@ -166,6 +181,7 @@ export default function Order() {
           <Text style={styles.buttonText}>Avançar</Text>
         </TouchableOpacity>
       </View>
+
       <FlatList
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, marginTop: 24 }}
@@ -173,9 +189,11 @@ export default function Order() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <ListItem data={item} deleteItem={handleDeleteItem} />}
       />
+
       <Modal transparent={true} visible={modalCategoryVisible} animationType="fade">
         <ModalPicker handleCloseModal={() => setModalCategoryVisible(false)} options={category} selectedItem={handleChangeCategory} />
       </Modal>
+
       <Modal transparent={true} visible={modalProductVisible} animationType="fade">
         <ModalPicker handleCloseModal={() => setModalProductVisible(false)} options={products} selectedItem={handleChangeProduct} />
       </Modal>

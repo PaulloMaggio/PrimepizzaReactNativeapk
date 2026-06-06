@@ -1,12 +1,15 @@
+import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { AuthContext } from '../../contexts/AuthContext';
 import { StackPramsList } from '../../routes/app.routes';
 import { api } from '../../services/api';
 
 export default function Dashboard() {
   const navigation = useNavigation<NativeStackNavigationProp<StackPramsList>>();
+  const { signOut } = useContext(AuthContext);
   const [number, setNumber] = useState('');
 
   async function openOrder() {
@@ -29,7 +32,12 @@ export default function Dashboard() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+        <Feather name="log-out" size={28} color="#FF3F4b" />
+      </TouchableOpacity>
+
       <Text style={styles.title}>Novo pedido</Text>
+
       <TextInput
         placeholder="Numero da mesa"
         placeholderTextColor="#F0F0F0"
@@ -38,6 +46,7 @@ export default function Dashboard() {
         value={number}
         onChangeText={setNumber}
       />
+
       <TouchableOpacity style={styles.button} onPress={openOrder}>
         <Text style={styles.buttonText}>Abrir mesa</Text>
       </TouchableOpacity>
@@ -52,6 +61,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     backgroundColor: '#1d1d2e'
+  },
+  logoutButton: {
+    position: 'absolute',
+    top: 40,
+    right: 25
   },
   title: {
     fontSize: 30,
